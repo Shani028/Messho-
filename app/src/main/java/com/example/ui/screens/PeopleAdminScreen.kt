@@ -27,7 +27,7 @@ import androidx.compose.material.icons.filled.Badge
 import androidx.compose.material.icons.filled.DeleteForever
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.LockOpen
-import androidx.compose.material.icons.filled.Logout
+import androidx.compose.material.icons.automirrored.filled.Logout
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.PersonAdd
 import androidx.compose.material.icons.filled.Security
@@ -590,7 +590,7 @@ fun PeopleAdminScreen(
                                                 .testTag("admin_logout_button")
                                         ) {
                                             Icon(
-                                                imageVector = Icons.Default.Logout,
+                                                imageVector = Icons.AutoMirrored.Filled.Logout,
                                                 contentDescription = "Logout Admin",
                                                 modifier = Modifier.size(18.dp)
                                             )
