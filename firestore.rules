@@ -1,0 +1,154 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Pillar 1: Global Default-Deny Safety Net
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Hardened Global Helpers
+    function isValidId(id) {
+      return id is string && id.size() >= 1 && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    function existing() {
+      return resource.data;
+    }
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isAdmin() {
+      return isSignedIn() && (
+        exists(/databases/$(database)/documents/admins/$(request.auth.uid)) ||
+        (
+          'email' in request.auth.token &&
+          'email_verified' in request.auth.token &&
+          request.auth.token.email == 'bhartisani933@gmail.com' &&
+          request.auth.token.email_verified == true
+        )
+      );
+    }
+
+    // Validation Blueprint: SkuItem
+    function isValidSku(data) {
+      return data.keys().hasAll([
+               'userId', 'productName', 'category', 'lengthCm', 'breadthCm', 'heightCm',
+               'deadWeightGrams', 'sellingPrice', 'productCost', 'packagingCost', 'zone',
+               'currentShippingCharge', 'optimizedShippingCharge', 'monthlyOrders',
+               'recommendation', 'createdAt', 'updatedAt'
+             ]) &&
+             data.keys().hasOnly([
+               'userId', 'productName', 'category', 'lengthCm', 'breadthCm', 'heightCm',
+               'deadWeightGrams', 'sellingPrice', 'productCost', 'packagingCost', 'zone',
+               'currentShippingCharge', 'optimizedShippingCharge', 'monthlyOrders',
+               'recommendation', 'createdAt', 'updatedAt'
+             ]) &&
+             data.userId is string && data.userId.size() >= 1 && data.userId.size() <= 128 && data.userId.matches('^[a-zA-Z0-9_\\-]+$') &&
+             data.productName is string && data.productName.size() >= 1 && data.productName.size() <= 120 &&
+             data.category is string && data.category.size() >= 1 && data.category.size() <= 60 &&
+             data.lengthCm is int && data.lengthCm >= 1 && data.lengthCm <= 300 &&
+             data.breadthCm is int && data.breadthCm >= 1 && data.breadthCm <= 300 &&
+             data.heightCm is int && data.heightCm >= 1 && data.heightCm <= 300 &&
+             data.deadWeightGrams is int && data.deadWeightGrams >= 1 && data.deadWeightGrams <= 50000 &&
+             data.sellingPrice is int && data.sellingPrice >= 1 && data.sellingPrice <= 1000000 &&
+             data.productCost is int && data.productCost >= 0 && data.productCost <= 1000000 &&
+             data.packagingCost is int && data.packagingCost >= 0 && data.packagingCost <= 100000 &&
+             data.zone is string && data.zone in ['Local', 'Zonal', 'National'] &&
+             data.currentShippingCharge is int && data.currentShippingCharge >= 0 && data.currentShippingCharge <= 50000 &&
+             data.optimizedShippingCharge is int && data.optimizedShippingCharge >= 0 && data.optimizedShippingCharge <= 50000 &&
+             data.monthlyOrders is int && data.monthlyOrders >= 1 && data.monthlyOrders <= 1000000 &&
+             data.recommendation is string && data.recommendation.size() >= 1 && data.recommendation.size() <= 500 &&
+             data.createdAt is timestamp && data.createdAt <= request.time &&
+             data.updatedAt is timestamp && data.updatedAt <= request.time;
+    }
+
+    // Validation Blueprint: MemberProfile
+    function isValidMember(data) {
+      return data.keys().hasAll([
+               'userId', 'personName', 'roleTitle', 'hubLocation', 'isAdminPerson', 'createdAt', 'updatedAt'
+             ]) &&
+             data.keys().hasOnly([
+               'userId', 'personName', 'roleTitle', 'hubLocation', 'isAdminPerson', 'createdAt', 'updatedAt'
+             ]) &&
+             data.userId is string && data.userId.size() >= 1 && data.userId.size() <= 128 && data.userId.matches('^[a-zA-Z0-9_\\-]+$') &&
+             data.personName is string && data.personName.size() >= 1 && data.personName.size() <= 100 &&
+             data.roleTitle is string && data.roleTitle in ['Admin', 'Vendor', 'Warehouse Manager', 'Packaging Lead', 'Logistics Staff'] &&
+             data.hubLocation is string && data.hubLocation.size() >= 1 && data.hubLocation.size() <= 100 &&
+             data.isAdminPerson is bool &&
+             data.createdAt is timestamp && data.createdAt <= request.time &&
+             data.updatedAt is timestamp && data.updatedAt <= request.time;
+    }
+
+    // Collection: /skus/{skuId}
+    match /skus/{skuId} {
+      allow get: if isSignedIn() && isValidId(skuId) && (existing().userId == request.auth.uid || isAdmin());
+      allow list: if isSignedIn() && (existing().userId == request.auth.uid || isAdmin());
+
+      allow create: if isSignedIn() &&
+                       isValidId(skuId) &&
+                       isValidSku(incoming()) &&
+                       incoming().userId == request.auth.uid;
+
+      allow update: if isSignedIn() &&
+                       isValidId(skuId) &&
+                       isValidSku(incoming()) &&
+                       incoming().userId == existing().userId &&
+                       incoming().createdAt == existing().createdAt &&
+                       (
+                         isAdmin() ||
+                         (
+                           existing().userId == request.auth.uid &&
+                           incoming().diff(existing()).affectedKeys().hasOnly([
+                             'productName', 'category', 'lengthCm', 'breadthCm', 'heightCm',
+                             'deadWeightGrams', 'sellingPrice', 'productCost', 'packagingCost',
+                             'zone', 'currentShippingCharge', 'optimizedShippingCharge',
+                             'monthlyOrders', 'recommendation', 'updatedAt'
+                           ])
+                         )
+                       );
+
+      allow delete: if isSignedIn() && isValidId(skuId) && (existing().userId == request.auth.uid || isAdmin());
+    }
+
+    // Collection: /members/{memberId}
+    match /members/{memberId} {
+      allow get: if isSignedIn() && isValidId(memberId) && (existing().userId == request.auth.uid || isAdmin());
+      allow list: if isSignedIn() && (existing().userId == request.auth.uid || isAdmin());
+
+      allow create: if isSignedIn() &&
+                       isValidId(memberId) &&
+                       isValidMember(incoming()) &&
+                       incoming().userId == request.auth.uid;
+
+      allow update: if isSignedIn() &&
+                       isValidId(memberId) &&
+                       isValidMember(incoming()) &&
+                       incoming().userId == existing().userId &&
+                       incoming().createdAt == existing().createdAt &&
+                       (
+                         isAdmin() ||
+                         (
+                           existing().userId == request.auth.uid &&
+                           incoming().diff(existing()).affectedKeys().hasOnly([
+                             'personName', 'roleTitle', 'hubLocation', 'isAdminPerson', 'updatedAt'
+                           ])
+                         )
+                       );
+
+      allow delete: if isSignedIn() && isValidId(memberId) && (existing().userId == request.auth.uid || isAdmin());
+    }
+
+    // Collection: /admins/{adminId} (System-only write, owner/admin read)
+    match /admins/{adminId} {
+      allow get: if isSignedIn() && isValidId(adminId) && (request.auth.uid == adminId || isAdmin());
+      allow list: if false;
+      allow create, update, delete: if false;
+    }
+  }
+}

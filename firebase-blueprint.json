@@ -1,0 +1,175 @@
+{
+  "entities": {
+    "SkuItem": {
+      "title": "SkuItem",
+      "description": "Represents a vendor product SKU with package dimensions, dead weight, volumetric weight optimization, and shipping charge savings.",
+      "type": "object",
+      "properties": {
+        "userId": {
+          "type": "string",
+          "description": "The UID of the authenticated owner."
+        },
+        "productName": {
+          "type": "string",
+          "description": "Name of the Meesho product SKU."
+        },
+        "category": {
+          "type": "string",
+          "description": "Product category (e.g. Ethnic Wear, Kitchen, Footwear, Electronics)."
+        },
+        "lengthCm": {
+          "type": "integer",
+          "description": "Package length in centimeters."
+        },
+        "breadthCm": {
+          "type": "integer",
+          "description": "Package breadth/width in centimeters."
+        },
+        "heightCm": {
+          "type": "integer",
+          "description": "Package height in centimeters."
+        },
+        "deadWeightGrams": {
+          "type": "integer",
+          "description": "Actual physical weight in grams."
+        },
+        "sellingPrice": {
+          "type": "integer",
+          "description": "Meesho selling price in INR."
+        },
+        "productCost": {
+          "type": "integer",
+          "description": "Sourcing/manufacturing cost in INR."
+        },
+        "packagingCost": {
+          "type": "integer",
+          "description": "Packaging material cost in INR."
+        },
+        "zone": {
+          "type": "string",
+          "enum": ["Local", "Zonal", "National"],
+          "description": "Shipping delivery zone."
+        },
+        "currentShippingCharge": {
+          "type": "integer",
+          "description": "Current Meesho shipping fee in INR before optimization."
+        },
+        "optimizedShippingCharge": {
+          "type": "integer",
+          "description": "Optimized Meesho shipping fee in INR after packaging/dimension reduction."
+        },
+        "monthlyOrders": {
+          "type": "integer",
+          "description": "Estimated monthly order volume for this SKU."
+        },
+        "recommendation": {
+          "type": "string",
+          "description": "Actionable packaging and dimension reduction recommendation."
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server timestamp when the SKU was created via FieldValue.serverTimestamp()."
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server timestamp when the SKU was last updated via FieldValue.serverTimestamp()."
+        }
+      },
+      "required": [
+        "userId",
+        "productName",
+        "category",
+        "lengthCm",
+        "breadthCm",
+        "heightCm",
+        "deadWeightGrams",
+        "sellingPrice",
+        "productCost",
+        "packagingCost",
+        "zone",
+        "currentShippingCharge",
+        "optimizedShippingCharge",
+        "monthlyOrders",
+        "recommendation",
+        "createdAt",
+        "updatedAt"
+      ]
+    },
+    "MemberProfile": {
+      "title": "MemberProfile",
+      "description": "Represents an Admin or any Person/Vendor/Staff profile whose name and role can be edited or deleted.",
+      "type": "object",
+      "properties": {
+        "userId": {
+          "type": "string",
+          "description": "The UID of the authenticated workspace owner."
+        },
+        "personName": {
+          "type": "string",
+          "description": "Full name of the admin or person (editable)."
+        },
+        "roleTitle": {
+          "type": "string",
+          "enum": ["Admin", "Vendor", "Warehouse Manager", "Packaging Lead", "Logistics Staff"],
+          "description": "Role assigned to this person."
+        },
+        "hubLocation": {
+          "type": "string",
+          "description": "Assigned dispatch hub or city."
+        },
+        "isAdminPerson": {
+          "type": "boolean",
+          "description": "Whether this person entry holds Admin designation in the vendor workspace."
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server timestamp when created via FieldValue.serverTimestamp()."
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server timestamp when updated via FieldValue.serverTimestamp()."
+        }
+      },
+      "required": [
+        "userId",
+        "personName",
+        "roleTitle",
+        "hubLocation",
+        "isAdminPerson",
+        "createdAt",
+        "updatedAt"
+      ]
+    },
+    "AdminRecord": {
+      "title": "AdminRecord",
+      "description": "System-managed administrator lookup document.",
+      "type": "object",
+      "properties": {
+        "grantedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Timestamp when admin privilege was provisioned."
+        }
+      },
+      "required": ["grantedAt"]
+    }
+  },
+  "firestore": {
+    "/skus/{skuId}": {
+      "schema": { "$ref": "#/entities/SkuItem" },
+      "description": "Stores vendor product SKUs and shipping charge optimization analyses."
+    },
+    "/members/{memberId}": {
+      "schema": { "$ref": "#/entities/MemberProfile" },
+      "description": "Stores Admin and Person directory records allowing name edits, role updates, and deletions."
+    },
+    "/admins/{adminId}": {
+      "schema": { "$ref": "#/entities/AdminRecord" },
+      "description": "Read-only admin registry for RBAC verification."
+    }
+  }
+}

@@ -1,0 +1,17 @@
+<resources>
+    <string name="app_name">Meesho ShipSmart</string>
+    <string name="sign_in_title">Meesho ShipSmart</string>
+    <string name="sign_in_subtitle">Reduce Volumetric Shipping Charges, Optimize Slabs &amp; Manage Admin/Vendor Profiles</string>
+    <string name="sign_in_with_google">Sign in with Google</string>
+    <string name="tab_optimizer">Fee Reducer</string>
+    <string name="tab_catalog">Saved SKUs</string>
+    <string name="tab_people_admin">Admin &amp; People</string>
+    <string name="admin_login_button">Admin Login</string>
+    <string name="admin_active_badge">Admin Mode Active</string>
+    <string name="add_person_button">Add Admin / Person</string>
+    <string name="rename_person_action">Change Name / Edit</string>
+    <string name="delete_person_action">Delete Person</string>
+    <string name="save_sku_button">Save Optimized SKU</string>
+    <string name="apply_optimization_button">Apply Smart Dimensions</string>
+    <string name="sign_out_description">Sign Out</string>
+</resources>

@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="320dp"
+    android:height="160dp"
+    android:viewportWidth="320"
+    android:viewportHeight="160">
+    <!-- Background subtle grid & glow circles -->
+    <path
+        android:fillColor="#26FF2E93"
+        android:pathData="M250,80m-65,0a65,65 0,1 1,130 0a65,65 0,1 1,-130 0" />
+    <path
+        android:fillColor="#1FFFB300"
+        android:pathData="M75,45m-45,0a45,45 0,1 1,90 0a45,45 0,1 1,-90 0" />
+    <!-- Isometric Parcel Box -->
+    <path
+        android:fillColor="#FFB300"
+        android:pathData="M160,34L214,60L160,86L106,60Z" />
+    <path
+        android:fillColor="#FFA000"
+        android:pathData="M106,60L160,86L160,136L106,110Z" />
+    <path
+        android:fillColor="#FF8F00"
+        android:pathData="M214,60L160,86L160,136L214,110Z" />
+    <!-- Packing Tape & Dimension Guides -->
+    <path
+        android:fillColor="#FFF8E1"
+        android:pathData="M133,47L187,73L178,77L124,51Z" />
+    <path
+        android:fillColor="#FF2E93"
+        android:pathData="M94,56h4v58h-4zM222,56h4v58h-4z" />
+    <!-- Savings Badge Pill -->
+    <path
+        android:fillColor="#00E676"
+        android:pathData="M236,36L296,36A14,14 0,0 1,310 50L310,66A14,14 0,0 1,296 80L236,80A14,14 0,0 1,222 66L222,50A14,14 0,0 1,236 36Z" />
+    <path
+        android:fillColor="#003319"
+        android:pathData="M266,46l-10,12h7v12l10,-12h-7z" />
+</vector>
